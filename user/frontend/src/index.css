@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+body {
+    font-family: "Poppins", sans-serif;
+}
+.text-primary {
+  color: #355872 !important;
+}
+.stroke-pink {
+    font-family: "M PLUS Rounded 1c", sans-serif;
+  -webkit-text-stroke-width: 3px; /* Set the width of the stroke */
+  /* font-weight: 800 !important; */
+  -webkit-text-stroke-color: #355872; /* Set the color of the stroke */
+  color: white; /* Set the fill color of the text itself */
+}
+
+
+/* From Uiverse.io by absoluteSTrange */ 
+button {
+  padding: 17px 30px;
+  border-radius: 10px;
+  border: 0;
+  background-color: #355872;
+  /* letter-spacing: 1.5px; */
+  font-size: 15px;
+  transition: all 0.3s ease;
+  box-shadow: #7AAACE 0px 7px 0px 0px;
+  color: hsl(0, 0%, 100%);
+  cursor: pointer;
+}
+
+button:hover {
+  box-shadow: #355872 0px 0px 0px 0px;
+}
+
+button:active {
+  background-color: #7AAACE;
+  /*50, 168, 80*/
+  box-shadow: #355872 0px 0px 0px 0px;
+  transform: translateY(5px);
+  transition: 200ms;
+}

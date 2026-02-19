@@ -6,10 +6,11 @@ export default function Home() {
 //   document.documentElement.requestFullscreen()
 
   return (
-    <div>
-      <h1>Welcome Photobooth</h1>
-      <button onClick={() => nav('/template')}>
-        Start
+    <div className='flex justify-center gap-10 items-center h-full flex-col'>
+      <h1 className='font-bold text-white stroke-pink text-5xl'>ZeBooth</h1>
+      <h1 className='' style={{fontStyle: 'italic'}}>Rekam, Senyum, Bagikan.</h1>
+      <button className='text-uppercase' onClick={() => nav('/verify')}>
+        TEKAN UNTUK MULAI
       </button>
     </div>
   )
