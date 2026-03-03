@@ -1,5 +1,6 @@
 import React from 'react'
 import Grainient from '../components/Gradient'
+import CheckSetup from '../components/CheckSetup'
 
 const Main = ({ children }) => {
   return (
@@ -33,8 +34,8 @@ const Main = ({ children }) => {
             />
         </div>
     </div>
-    <div className='w-full h-[100vh]  absolute left-0 top-0 z-[] p-8'>
-        <div className='w-full h-full bg-white/80 p-10 rounded-xl'>
+    <div className='w-full h-[100vh]  absolute left-0 top-0 z-[] '>
+        <div className='w-full h-full  p-10 ' style={{background: "url('/images/bg.jpg') center center", backgroundSize: 'cover'}}>
             {children}
         </div>
 

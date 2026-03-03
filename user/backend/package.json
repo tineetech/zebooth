@@ -7,13 +7,17 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "nodemon --watch controllers index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "fs-extra": "^11.3.3",
+    "multer": "^2.0.2",
+    "mysql2": "^3.18.0",
     "nodemon": "^3.1.11",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "uuid": "^13.0.0"
   }
 }

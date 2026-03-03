@@ -1,47 +1,60 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const api = import.meta.env.VITE_BE_URL;
 
 const categories = ["Most Used", "Classic", "Vintage", "Trendy", "Cute & Fun"];
 
-const templates = [
-  {
-    id: 1,
-    category: "Most Used",
-    name: "Floral Peach",
-    image: "/templates/temp1.png",
-  },
-  {
-    id: 2,
-    category: "Most Used",
-    name: "Cute Sky",
-    image: "/templates/temp2.png",
-  },
-  {
-    id: 3,
-    category: "Most Used",
-    name: "Green Garden",
-    image: "/templates/temp3.png",
-  },
-  {
-    id: 4,
-    category: "Classic",
-    name: "Minimal Strip",
-    image: "/templates/temp4.png",
-  },
-];
 
 function SelectTemplate() {
   const [activeCategory, setActiveCategory] = useState("Most Used");
-  const [selectedTemplate, setSelectedTemplate] = useState(templates[0]);
+  const [templates, setTemplates] = useState([])
+  const [selectedTemplate, setSelectedTemplate] = useState({});
 
-  const filtered = templates.filter(
-    (t) => t.category === activeCategory
-  );
+  const navigate = useNavigate();
+  const getFrameId = localStorage.getItem('frame_id')
+  console.log(getFrameId)
 
+  const getFrameTemplate = () => {
+    fetch(api + '/api/frame/get-template')
+    .then(res => res.json())
+    .then(data => {
+      const filtered = data.data.filter(
+        (t) => t.category === activeCategory && t.frame_config_id == getFrameId
+      );
+      setTemplates(filtered)
+      setSelectedTemplate(filtered[0])
+      console.log(filtered)
+    })
+  }
+  
+  const saveTemplate = () => {
+    const kode_tiket = localStorage.getItem('kode_tiket')
+    fetch(api + '/api/frame/save-template', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          frame_id: selectedTemplate.id,
+          kode_tiket,
+        }),
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        navigate('/panduan')
+      }
+    })
+  }
+
+
+  useEffect(() => {
+    getFrameTemplate()
+  }, [])
   return (
     <div className="w-full flex flex-col relative mt-0 h-full p-6">
 
       {/* ⏱ Timer */}
-      <div className="absolute top-6 right-6 text-xl font-semibold text-gray-700">
+      <div className="absolute top-6 right-6 text-xl font-semibold text-gray-300">
         ⏱ 05:00
       </div>
 
@@ -51,10 +64,10 @@ function SelectTemplate() {
       </h1>
 
       {/* 📦 Main Layout */}
-      <div className="flex flex-1 gap-6 mb-10">
+      <div className="flex flex-1 gap-6 mb-5">
 
         {/* LEFT PANEL */}
-        <div className="w-1/2 bg-white rounded-2xl shadow-lg p-4 flex gap-4">
+        <div className="w-1/2 bg-white h-[430px] rounded-2xl shadow-lg p-4 flex gap-4">
 
           {/* Categories */}
           <div className="w-36 border-r pr-3 gap-2 flex flex-col">
@@ -74,35 +87,51 @@ function SelectTemplate() {
           </div>
 
           {/* Templates Grid */}
-          <div className="flex-1 grid grid-cols-2 gap-3 overflow-y-auto pr-1">
-            {filtered.map((tpl) => (
+          <div className="flex-1 grid grid-cols-2 gap-3 p-1 overflow-y-auto pr-1">
+            {templates.map((tpl) => (
               <div
                 key={tpl.id}
                 onClick={() => setSelectedTemplate(tpl)}
-                className={`cursor-pointer rounded-xl overflow-hidden border-2 transition hover:scale-105 ${
+                className={`cursor-pointer h-[200px] py-2 rounded-md transition-all ease-in-out  ${
                   selectedTemplate.id === tpl.id
-                    ? "border-[#355872]"
+                    ? ""
                     : "border-transparent"
                 }`}
+                style={{boxShadow: selectedTemplate.id === tpl.id ? "0 0 5px rgba(0,0,0,.2)" : ""}}
               >
-                <img
-                  src={tpl.image}
-                  alt={tpl.name}
-                  className="w-full h-40 object-cover"
-                />
+                
+                <div className="flex w-full h-full">
+                  <img
+                    src={"/images/template_bingkai/" + tpl.location}
+                    alt={tpl.name}
+                    className="w-full h-full object-contain object-right"
+                  />
+                  <img
+                    src={"/images/template_bingkai/" + tpl.location}
+                    alt={tpl.name}
+                    className="w-full h-full object-contain object-left"
+                  />
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* RIGHT PANEL (PREVIEW) */}
-        <div className="w-1/2 bg-white rounded-2xl shadow-lg p-6 flex items-center justify-center">
-          <div className="w-full max-w-sm rounded-xl overflow-hidden shadow-lg border">
-            <img
-              src={selectedTemplate.image}
-              alt="Preview"
-              className="w-full object-cover"
-            />
+        <div className="w-1/2 bg-white h-[430px] rounded-2xl shadow-lg p-6 flex items-center justify-center">
+          <div className="w-full max-w-sm rounded-xl overflow-hidden h-full">            
+            <div className="flex w-full h-full">
+              <img
+                src={"/images/template_bingkai/" + selectedTemplate.location}
+                alt="Preview"
+                className="w-full h-full object-contain object-right"
+              />
+              <img
+                src={"/images/template_bingkai/" + selectedTemplate.location}
+                alt="Preview"
+                className="w-full h-full object-contain object-left"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -114,7 +143,7 @@ function SelectTemplate() {
 
       {/* NEXT ➡ */}
       <div className="flex justify-end">
-        <button className=" bg-[#f6a57f] text-white px-6 py-2 rounded-xl font-semibold shadow hover:scale-105 transition">
+        <button className=" bg-[#f6a57f] text-white px-6 py-2 rounded-xl font-semibold shadow hover:scale-105 transition" onClick={() => saveTemplate()}>
           NEXT →
         </button>
 

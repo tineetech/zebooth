@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+const api = import.meta.env.VITE_BE_URL;
 
 const Verify = () => {
   const scannerRef = useRef(null);
@@ -23,24 +24,51 @@ const Verify = () => {
             if (hasScannedRef.current) return;
             hasScannedRef.current = true;
 
-            console.log("SCAN RESULT:", decodedText);
+            
+            const res = await fetch(api + "/api/tiket/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                tiket: decodedText,
+              }),
+            });
 
-            // Stop scanner langsung
-            if (scannerRef.current && startedRef.current) {
-              await scannerRef.current.stop();
-              await scannerRef.current.clear();
+            const data = await res.json()
+
+            if (data.success) {
+              if (scannerRef.current && startedRef.current) {
+                await scannerRef.current.stop();
+                await scannerRef.current.clear();
+              }
+              console.log("SCAN RESULT:", decodedText);
+              localStorage.setItem('kode_tiket', data.data.kode_tiket)
+              localStorage.setItem('frame_id', data.data.frame_config_id)
+              Swal.fire({
+                title: "Success!",
+                text: "Berhasil verifikasi QR, lanjut pilih template",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false,
+                timerProgressBar: true,
+              }).then(() => {
+                navigate("/template");
+              });
+            } else {
+              Swal.fire({
+                title: "Gagal!",
+                text: "Gagal verifikasi QR, kode salah atau pembayaran belum selesai",
+                icon: "error",
+                timer: 2000,
+                showConfirmButton: false,
+                timerProgressBar: true,
+              }).then(() => {
+                navigate("/verify");
+              });
             }
 
-            Swal.fire({
-              title: "Success!",
-              text: "Berhasil verifikasi QR, lanjut pilih template",
-              icon: "success",
-              timer: 2000,
-              showConfirmButton: false,
-              timerProgressBar: true,
-            }).then(() => {
-              navigate("/template");
-            });
+
+            // Stop scanner langsung
+
           },
           () => {}
         );
