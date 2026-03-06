@@ -22,7 +22,7 @@ class TiketForm
                     ->relationship('frameConfig', 'name')
                     ->searchable()
                     ->preload()
-                    ->rules(['nullable','integer','exists:frame_config,id']),
+                    ->rules(['nullable', 'integer', 'exists:frame_config,id']),
 
                 // Room Box
                 Select::make('room_box_id')
@@ -31,30 +31,31 @@ class TiketForm
                     ->required()
                     ->searchable()
                     ->preload()
-                    ->rules(['required','integer','exists:room_box,id']),
+                    ->rules(['required', 'integer', 'exists:room_box,id']),
 
                 // Ticket Code
                 TextInput::make('ticket_code')
                     ->label('Ticket code')
                     ->helperText('Generated automatically on save')
                     ->maxLength(32)
-                    ->rules(['nullable','string','max:32','unique:tiket,ticket_code,{{record}}']),
+                    ->unique(table: 'tiket', column: 'ticket_code', ignoreRecord: true)
+                    ->rules(['nullable', 'string', 'max:32']),
 
                 TextInput::make('client_name')
                     ->required()
                     ->maxLength(255)
-                    ->rules(['required','string','max:255']),
+                    ->rules(['required', 'string', 'max:255']),
 
                 TextInput::make('session_time')
                     ->numeric()
                     ->label('Session (minutes)')
                     ->required()
-                    ->rules(['required','integer','min:1']),
+                    ->rules(['required', 'integer', 'min:1']),
 
                 TextInput::make('payment')
                     ->required()
                     ->maxLength(255)
-                    ->rules(['required','in:cash,qris']),
+                    ->rules(['required', 'in:cash,qris']),
 
                 Toggle::make('status_payment')
                     ->label('Paid?')
@@ -67,15 +68,7 @@ class TiketForm
                         'finish' => 'Finished',
                     ])
                     ->required()
-                    ->rules(['required','in:waiting,running,finish']),
-
-                // Frame Template
-                Select::make('frame_template_id')
-                    ->label('Frame template')
-                    ->relationship('frameTemplate', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->rules(['nullable','integer','exists:frame_template,id']),
+                    ->rules(['required', 'in:waiting,running,finish']),
 
                 // QR Code Preview
                 Placeholder::make('qr_preview')
@@ -93,6 +86,6 @@ class TiketForm
                             return new HtmlString(e($value));
                         }
                     }),
-        ]);
+            ]);
     }
 }

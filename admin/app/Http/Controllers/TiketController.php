@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Tiket;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TiketController extends Controller
 {
@@ -28,7 +29,7 @@ class TiketController extends Controller
         }
 
         // Ticket check
-        $valid = $tiket->status_payment && in_array($tiket->status, ['waiting','running']);
+        $valid = $tiket->status_payment && in_array($tiket->status, ['waiting', 'running']);
 
         return response()->json([
             'valid' => $valid,
@@ -42,6 +43,9 @@ class TiketController extends Controller
      */
     public function print(Tiket $tiket)
     {
-        return view('tickets.print', compact('tiket'));
+        $pdf = Pdf::loadView('tickets.print', compact('tiket'))
+            ->setPaper([0, 0, 300, 420], 'portrait'); // Custom size (width x height)
+
+        return $pdf->stream('Ticket-' . $tiket->ticket_code . '.pdf');
     }
 }

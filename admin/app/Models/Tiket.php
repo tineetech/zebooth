@@ -31,7 +31,7 @@ class Tiket extends Model
     {
         static::creating(function (Tiket $ticket) {
             if (empty($ticket->ticket_code)) {
-                $ticket->ticket_code = strtoupper(Str::random(8));
+                $ticket->ticket_code = strtoupper(Str::random(4) . '-' . Str::random(4));
             }
 
             if (empty($ticket->status)) {
