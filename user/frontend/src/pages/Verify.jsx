@@ -99,7 +99,7 @@ const Verify = () => {
     <div className="w-full h-full grid md:grid-cols-2 gap-6">
       {/* LEFT */}
       <div className="flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-bold text-[#355872] mb-4">
+        <h1 className="text-3xl font-bold text-white mb-4">
           Silakan Scan Barcode
         </h1>
 
@@ -107,7 +107,7 @@ const Verify = () => {
           <div id="reader" className="w-full h-full" />
         </div>
 
-        <p className="text-sm text-gray-500 mt-3 text-center max-w-sm">
+        <p className="text-sm text-gray-400 mt-3 text-center max-w-sm">
           Arahkan barcode atau QR tiket ke kamera
         </p>
       </div>
@@ -115,11 +115,11 @@ const Verify = () => {
       {/* RIGHT SIDE */}
       <div className="flex w-full">
         <div className="p-6 h-full w-full flex flex-col justify-center border-l border-gray-400">
-          <h2 className="text-xl font-bold mb-4 text-[#355872]">
+          <h2 className="text-xl font-bold mb-4 text-white">
             Panduan Scan
           </h2>
 
-          <ul className="space-y-3 text-gray-600">
+          <ul className="space-y-3 text-gray-400">
             <li className="flex gap-2">📱 Siapkan tiket barcode atau QR</li>
             <li className="flex gap-2">📷 Posisikan di tengah kamera</li>
             <li className="flex gap-2">⚡ Pastikan pencahayaan cukup</li>

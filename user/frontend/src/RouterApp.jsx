@@ -30,10 +30,10 @@ function App() {
           <Route path="/panduan" element={<Panduan />} />
           <Route path="/camera" element={<Camera />} />
           <Route path="/filter" element={<Filter />} />
-          <Route path="/preview" element={<Preview />} />
+          {/* <Route path="/preview" element={<Preview />} /> */}
           <Route path="/waiting" element={<Waiting />} />
-          <Route path="/print" element={<Preview />} />
-          <Route path="/result" element={<Result />} />
+          {/* <Route path="/print" element={<Preview />} /> */}
+          {/* <Route path="/result" element={<Result />} /> */}
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />

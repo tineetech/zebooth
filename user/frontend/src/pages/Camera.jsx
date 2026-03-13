@@ -74,25 +74,43 @@ export default function Camera() {
   const shootingLock = useRef(false);
 
   const takePhoto = () => {
-    if (shootingLock.current) return; // cegah double trigger
+    if (shootingLock.current) return;
     shootingLock.current = true;
 
     setTimeout(() => {
       shootingLock.current = false;
-    }, 500); // lock 0.5 detik
-
-    setFlash(true);
-    setTimeout(() => setFlash(false), 120);
+    }, 500);
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
+
+    if (!video || !canvas) return;
+
+    // ❗ cek apakah video sudah siap
+    if (video.readyState < 2) {
+      console.log("Video belum siap");
+      return;
+    }
+
     const ctx = canvas.getContext("2d");
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
+    const width = video.videoWidth;
+    const height = video.videoHeight;
+
+    if (!width || !height) {
+      console.log("Video size belum ada");
+      return;
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+
+    ctx.drawImage(video, 0, 0, width, height);
 
     const data = canvas.toDataURL("image/png");
+
+    setFlash(true);
+    setTimeout(() => setFlash(false), 120);
 
     setShots((prev) => {
       const updated = [...prev, data];
@@ -101,18 +119,33 @@ export default function Camera() {
         setShooting(false);
       }
 
-      console.log("NEW LENGTH:", updated.length);
       return updated;
     });
   };
-
   // ================= RESET =================
-  const resetShoot = () => {
+  const resetShoot = async () => {
     setShots([]);
-    // setCountdown(5);
     setCountdown(2);
     setShooting(true);
+
+    const video = videoRef.current;
+
+    if (stream && video) {
+      video.srcObject = null;
+
+      setTimeout(() => {
+        video.srcObject = stream;
+        video.play();
+      }, 200);
+    } else {
+      await startCamera();
+    }
   };
+  useEffect(() => {
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
 
   // ================= GRID =================
   const renderGrid = () => {
