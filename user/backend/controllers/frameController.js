@@ -56,11 +56,14 @@ router.get("/get-template", async (req, res) => {
       });
     }
 
-    const frameRows = rows;
-
+    const frameRows = rows.map(row => ({
+      ...row,
+      location: "http://127.0.0.1:8000/storage/" + row.location
+    }));
     // =========================
     // SUCCESS
     // =========================
+    console.log(frameRows)
 
     res.json({
       success: true,

@@ -14,11 +14,11 @@ class EditTiket extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('print')
-                ->label('Print QR')
-                ->icon('heroicon-o-printer')
-                ->url(fn () => route('ticket.print', $this->record))
-                ->openUrlInNewTab(),
+            // Action::make('print')
+            //     ->label('Print QR')
+            //     ->icon('heroicon-o-printer')
+            //     ->url(fn () => route('ticket.print', $this->record))
+            //     ->openUrlInNewTab(),
             DeleteAction::make(),
         ];
     }

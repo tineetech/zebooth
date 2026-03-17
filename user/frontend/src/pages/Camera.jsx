@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const api = import.meta.env.VITE_BE_URL;
 
@@ -12,10 +13,26 @@ export default function Camera() {
   const [shots, setShots] = useState([]);
   const [shooting, setShooting] = useState(true);
   const [countdown, setCountdown] = useState(2);
-  const [sessionTimer, setSessionTimer] = useState(300);
+  const getSessionTime = localStorage.getItem('session_time')
+  const sessionTimeMs = getSessionTime * 60;
+  const [sessionTimer, setSessionTimer] = useState(sessionTimeMs);
+  const [locked, setLocked] = useState(false);
   const [flash, setFlash] = useState(false);
 
   const MAX_SHOTS = 10;
+
+  const getTiketConfig = () => {
+    const kode_tiket = localStorage.getItem('kode_tiket')
+    fetch(api + '/api/tiket/get-detail/' + kode_tiket)
+    .then(res => res.json())
+    .then(data => {
+      console.log(data.data)
+    })
+  }
+
+  useEffect(() => {
+    getTiketConfig()
+  }, [])
 
   // ================= CAMERA =================
   useEffect(() => {
@@ -39,6 +56,7 @@ export default function Camera() {
     stream?.getTracks().forEach((t) => t.stop());
   };
 
+
   // ================= SESSION TIMER =================
   useEffect(() => {
     const timer = setInterval(() => {
@@ -52,6 +70,67 @@ export default function Camera() {
     const s = sec % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
+
+  const [timeoutShown, setTimeoutShown] = useState(false);
+  useEffect(() => {
+    const isTimeout = localStorage.getItem('foto_timeout') === 'true';
+
+    if ((sessionTimer === 0 || isTimeout) && !timeoutShown) {
+      setTimeoutShown(true);
+      setShooting(false);
+      setLocked(true);
+      stopCamera();
+
+      localStorage.setItem('foto_timeout', 'true');
+
+      Swal.fire({
+        icon: "warning",
+        title: "Waktu Habis!",
+        text: "Silakan minta waktu tambahan sebesar Rp2.000/1 menit ke admin.",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#f6a57f",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+    }
+  }, [sessionTimer, timeoutShown]);
+
+  useEffect(() => {
+    if (!locked) return;
+
+    const kode_tiket = localStorage.getItem("kode_tiket");
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(api + "/api/tiket/check-additional-times/" + kode_tiket);
+
+        const data = await res.json();
+
+        if (data.success && data.data.additional_time > 0) {
+          localStorage.setItem('foto_timeout', false)
+          
+          setTimeoutShown(false);
+          setSessionTimer(data.data.additional_time * 60);
+          setLocked(false);
+          setShooting(true);
+          startCamera();
+          fetch(api + '/api/tiket/set-null-additional-times/' + kode_tiket)
+          .then(res => res.json())
+          .then(data => {
+
+            if (data.success) {
+              console.log('success set to null ', data)
+            }
+          })
+        }
+        console.log(data)
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [locked]);
 
   // ================= AUTO SHOOT =================
   useEffect(() => {
@@ -265,29 +344,25 @@ export default function Camera() {
         📸 {shots.length}
       </div>
 
-      {/* COUNTER FOTO (kanan & kiri pakai class counter-foto) */}
-      {/* {
-        !finished && (
-          <>
-            <div className="absolute right-4 top-[50%]">
-              <div className="counter-foto w-[55px] h-[55px] flex items-center justify-center rounded-full bg-primary text-white font-bold text-lg">
-                {shots.length}
-              </div>
-            </div>
+      {locked && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex flex-col items-center justify-center text-white">
+          <h1 className="text-4xl font-bold mb-4">⛔ Waktu Habis</h1>
 
-            <div className="absolute left-4 top-[50%]">
-              <div className="counter-foto w-[55px] h-[55px] flex items-center justify-center rounded-full bg-primary text-white font-bold text-lg">
-                {shots.length}
-              </div>
-            </div>
-          </>
-        )
-      } */}
+          <p className="text-lg mb-6 text-center max-w-md">
+            Silakan minta tambahan waktu ke admin  
+            sebesar <span className="font-bold text-yellow-400">Rp2.000/1 menit</span>
+          </p>
+
+          <div className="animate-pulse text-sm text-gray-300">
+            Menunggu konfirmasi dari admin...
+          </div>
+        </div>
+      )}
 
       {
         !finished && (
           <div className="flex flex-col items-center justify-center">
-            <h1 className="text-2xl font-bold text-white mb-4">
+            <h1 className="text-4xl font-bold text-white mb-6">
               Ambil Pose Terbaikmu 
             </h1>
 
@@ -337,7 +412,7 @@ export default function Camera() {
               )
             }
 
-            <p className="text-sm text-gray-500 mt-3 text-center max-w-sm">
+            <p className="text-sm text-gray-300 mt-3 text-center max-w-sm">
               Foto otomatis tiap 5 detik sebanyak 10x.
             </p>
           </div>
@@ -346,7 +421,7 @@ export default function Camera() {
 
       {/* GRID HASIL (muncul setelah selesai) */}
       {finished && (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-[93%]">
 
 
           <div className="w-full flex flex-col items-center h-full justify-center">

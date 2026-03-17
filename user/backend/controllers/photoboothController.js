@@ -5,6 +5,7 @@ import pool from "../config/db.js";
 import { fileURLToPath } from "url";
 import QRCode from "qrcode";
 import sharp from "sharp";
+import fetch from "node-fetch";
 import { v4 as uuidv4 } from "uuid";
 
 // Mendefinisikan __dirname secara manual untuk ES Modules
@@ -160,11 +161,14 @@ router.post("/save-session", async (req, res) => {
     // =========================
     // 4. APPLY FRAME
     // =========================
-    const framePath = path.join(
-      __dirname,
-    //   "../public/images/frames/20260224_121138.png"
-      "../public/images/frames/" + tiketRows.frame_location
-    );
+    // const framePath = path.join(
+    //   __dirname,
+    // //   "../public/images/frames/20260224_121138.png"
+    //   "../public/images/frames/" + tiketRows.frame_location
+    // );
+    const framePath = "http://127.0.0.1:8000/storage/" + tiketRows.frame_location;
+    const response = await fetch(framePath);
+    const frameBufferRaw = await response.buffer();
 
     const finalPath = path.join(sessionDir, "final.png");
 
@@ -175,7 +179,7 @@ router.post("/save-session", async (req, res) => {
       .ensureAlpha()
       .toBuffer();
 
-    const frameBuffer = await sharp(framePath)
+    const frameBuffer = await sharp(frameBufferRaw)
       .rotate()
       .resize(mergedMeta.width, mergedMeta.height, { fit: "fill" })
       .ensureAlpha()

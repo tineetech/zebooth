@@ -43,6 +43,7 @@ const Verify = () => {
               console.log("SCAN RESULT:", decodedText);
               localStorage.setItem('kode_tiket', data.data.kode_tiket)
               localStorage.setItem('frame_id', data.data.frame_config_id)
+              localStorage.setItem('session_time', data.data.data.session_time)
               Swal.fire({
                 title: "Success!",
                 text: "Berhasil verifikasi QR, lanjut pilih template",

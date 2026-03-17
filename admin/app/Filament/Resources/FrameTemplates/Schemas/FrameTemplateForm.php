@@ -5,6 +5,8 @@ namespace App\Filament\Resources\FrameTemplates\Schemas;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 
 class FrameTemplateForm
 {
@@ -12,17 +14,26 @@ class FrameTemplateForm
     {
         return $schema
             ->components([
-                TextInput::make('frame_config_id')
-                    ->numeric(),
-                TextInput::make('category')
+                FileUpload::make('location')
+                    ->visibility('public')
+                    ->disk('public')
+                    ->directory('frames') // Folder penyimpanan di storage
+                    ->image() // Opsional: batasi hanya untuk gambar
+                    ->label('Gambar Frame'),
+                Select::make('frame_config_id')
+                    ->relationship('frameConfig', 'name'),
+                Select::make('category')
                     ->required()
+                    ->options([
+                        'Most Used' => 'Most Used',
+                        'Classic' => 'Classic',
+                        'Vintage' => 'Vintage',
+                        'Trendy' => 'Trendy',
+                        'Cute & Fun' => 'Cute & Fun',
+                    ])
                     ->default('Most Used'),
                 TextInput::make('name'),
-                TextInput::make('location'),
-                DateTimePicker::make('createdAt')
-                    ->required(),
-                DateTimePicker::make('updatedAt')
-                    ->required(),
+                // TextInput::make('location'),
             ]);
     }
 }

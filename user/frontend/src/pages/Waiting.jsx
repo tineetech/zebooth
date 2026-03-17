@@ -70,8 +70,8 @@ const Waiting = () => {
   }, [allPhotos]);
 
   return (
-    <div className="h-full flex items-center justify-center">
-      <div className="bg-white shadow-2xl h-full rounded-2xl overflow-hidden w-full w-full grid md:grid-cols-2">
+    <div className="h-[96%] flex items-center justify-center">
+      <div className="bg-white shadow-2xl h-full rounded-2xl overflow-hidden w-full  grid md:grid-cols-2">
         
         {/* LEFT SIDE - Photo Preview */}
         <div className="bg-pink-50  flex flex-col items-center justify-center">

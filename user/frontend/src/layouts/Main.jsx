@@ -40,6 +40,15 @@ const Main = ({ children }) => {
         </div>
 
     </div>
+
+    <div className='absolute text-white text-sm bottom-5 left-5 p-4'>
+        <span>Version 1.0.0</span>
+
+    </div>
+    <div className='absolute text-white text-sm bottom-5 right-5 p-4'>
+        <span>Zebooth Copyright.</span>
+
+    </div>
     </main>
   )
 }

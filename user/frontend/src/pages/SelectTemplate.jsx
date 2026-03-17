@@ -13,7 +13,10 @@ function SelectTemplate() {
 
   const navigate = useNavigate();
   const getFrameId = localStorage.getItem('frame_id')
-  console.log(getFrameId)
+  const getSessionTime = localStorage.getItem('session_time')
+  
+  const formattedHour = String(getSessionTime).padStart(2, '0'); 
+  const formattedTime = getSessionTime ? `${formattedHour}:00` : '00:00'; 
 
   const getFrameTemplate = () => {
     fetch(api + '/api/frame/get-template')
@@ -51,11 +54,11 @@ function SelectTemplate() {
     getFrameTemplate()
   }, [])
   return (
-    <div className="w-full flex flex-col relative mt-0 h-full p-6">
+    <div className="w-full flex flex-col relative mt-0 !h-[300px] p-6">
 
       {/* ⏱ Timer */}
       <div className="absolute top-6 right-6 text-xl font-semibold text-gray-300">
-        ⏱ 05:00
+        ⏱ {formattedTime ?? '00:00'}
       </div>
 
       {/* 🏷 Title */}
@@ -64,10 +67,10 @@ function SelectTemplate() {
       </h1>
 
       {/* 📦 Main Layout */}
-      <div className="flex flex-1 gap-6 mb-5">
+      <div className="flex flex-1 gap-6 mb-5 ">
 
         {/* LEFT PANEL */}
-        <div className="w-1/2 bg-white h-[430px] rounded-2xl shadow-lg p-4 flex gap-4">
+        <div className="w-1/2 bg-white h-[500px] rounded-2xl shadow-lg p-4 flex gap-4">
 
           {/* Categories */}
           <div className="w-36 border-r pr-3 gap-2 flex flex-col">
@@ -102,12 +105,12 @@ function SelectTemplate() {
                 
                 <div className="flex w-full h-full">
                   <img
-                    src={"/images/template_bingkai/" + tpl.location}
+                    src={tpl.location}
                     alt={tpl.name}
                     className="w-full h-full object-contain object-right"
                   />
                   <img
-                    src={"/images/template_bingkai/" + tpl.location}
+                    src={tpl.location}
                     alt={tpl.name}
                     className="w-full h-full object-contain object-left"
                   />
@@ -118,16 +121,16 @@ function SelectTemplate() {
         </div>
 
         {/* RIGHT PANEL (PREVIEW) */}
-        <div className="w-1/2 bg-white h-[430px] rounded-2xl shadow-lg p-6 flex items-center justify-center">
+        <div className="w-1/2  h-[430px] rounded-2xl shadow-lg p-6 flex items-center justify-center">
           <div className="w-full max-w-sm rounded-xl overflow-hidden h-full">            
             <div className="flex w-full h-full">
               <img
-                src={"/images/template_bingkai/" + selectedTemplate.location}
+                src={selectedTemplate.location}
                 alt="Preview"
                 className="w-full h-full object-contain object-right"
               />
               <img
-                src={"/images/template_bingkai/" + selectedTemplate.location}
+                src={selectedTemplate.location}
                 alt="Preview"
                 className="w-full h-full object-contain object-left"
               />
@@ -142,8 +145,8 @@ function SelectTemplate() {
       </button> */}
 
       {/* NEXT ➡ */}
-      <div className="flex justify-end">
-        <button className=" bg-[#f6a57f] text-white px-6 py-2 rounded-xl font-semibold shadow hover:scale-105 transition" onClick={() => saveTemplate()}>
+      <div className="flex justify-end -mt-15 ">
+        <button className=" bg-[#f6a57f] text-white px-6 py-1 rounded-xl font-semibold shadow hover:scale-105 transition" onClick={() => saveTemplate()}>
           NEXT →
         </button>
 
