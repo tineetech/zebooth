@@ -1,37 +1,50 @@
 @import "tailwindcss";
 
+/* ========================
+   BASE
+======================== */
 body {
-    font-family: "Poppins", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
+
+/* ========================
+   COLORS / UTILITIES
+======================== */
 .text-primary {
   color: #fff !important;
 }
+
 .bg-primary {
   background-color: #355872 !important;
 }
+
+/* Text Stroke Style */
 .stroke-pink {
   font-family: "M PLUS Rounded 1c", sans-serif;
-  -webkit-text-stroke-width: 3px; /* Set the width of the stroke */
-  /* font-weight: 800 !important; */
-  -webkit-text-stroke-color: #355872; /* Set the color of the stroke */
-  color: #355872; /* Set the fill color of the text itself */
+  -webkit-text-stroke-width: 3px;
+  -webkit-text-stroke-color: white;
+  color: white;
 }
+
+/* Preview Grid Effect */
 .preview-on-grid {
   filter: brightness(150%);
 }
 
-/* From Uiverse.io by absoluteSTrange */ 
+/* ========================
+   BUTTON STYLE
+======================== */
 button {
   padding: 17px 30px;
   border-radius: 10px;
   border: 0;
-  background-color: #355872;
-  /* letter-spacing: 1.5px; */
   font-size: 15px;
-  transition: all 0.3s ease;
-  box-shadow: #7AAACE 0px 7px 0px 0px;
-  color: hsl(0, 0%, 100%);
+  background-color: #355872;
+  color: #fff;
   cursor: pointer;
+
+  box-shadow: #7aaace 0px 7px 0px 0px;
+  transition: all 0.3s ease;
 }
 
 button:hover {
@@ -39,17 +52,42 @@ button:hover {
 }
 
 button:active {
-  background-color: #7AAACE;
-  /*50, 168, 80*/
+  background-color: #7aaace;
   box-shadow: #355872 0px 0px 0px 0px;
   transform: translateY(5px);
   transition: 200ms;
 }
 
+/* ========================
+   ANIMATIONS
+======================== */
+
+/* Fade Animation */
 @keyframes fade {
-  from { opacity: 0.5; }
-  to { opacity: 1;}
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
 }
+
 .animate-fade {
-  animation: fade .25s ease;
+  animation: fade 0.25s ease;
+}
+
+/* Scale In Animation */
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s ease-out;
 }

@@ -3,6 +3,7 @@ import Grainient from '../components/Gradient'
 import CheckSetup from '../components/CheckSetup'
 
 const Main = ({ children }) => {
+    
   return (
     <main className='w-full h-[100vh]  relative'>
 
@@ -38,6 +39,15 @@ const Main = ({ children }) => {
         <div className='w-full h-full  p-10 ' style={{background: "url('/images/bg.jpg') center center", backgroundSize: 'cover'}}>
             {children}
         </div>
+
+    </div>
+
+    <div className='absolute text-white text-sm bottom-5 left-5 p-4'>
+        <span>Version 1.0.0</span>
+
+    </div>
+    <div className='absolute text-white text-sm bottom-5 right-5 p-4'>
+        <span>Zebooth Copyright.</span>
 
     </div>
     </main>

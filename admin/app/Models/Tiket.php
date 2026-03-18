@@ -18,8 +18,11 @@ class Tiket extends Model
         'ticket_code',
         'client_name',
         'session_time',
+        'additional_time',
         'payment',
         'status_payment',
+        'status_print',
+        'status_reset',
         'status',
         'frame_template_id',
     ];

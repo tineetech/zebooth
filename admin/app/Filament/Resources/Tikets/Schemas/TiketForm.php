@@ -52,6 +52,11 @@ class TiketForm
                     ->required()
                     ->rules(['required', 'integer', 'min:1']),
 
+                TextInput::make('additional_time')
+                    ->numeric()
+                    ->label('Additional Time (minutes)')
+                    ->rules(['integer']),
+
                 TextInput::make('payment')
                     ->required()
                     ->maxLength(255)
@@ -59,6 +64,14 @@ class TiketForm
 
                 Toggle::make('status_payment')
                     ->label('Paid?')
+                    ->rules(['boolean']),
+
+                Toggle::make('status_print')
+                    ->label('Print?')
+                    ->rules(['boolean']),
+
+                Toggle::make('status_reset')
+                    ->label('Reset?')
                     ->rules(['boolean']),
 
                 Select::make('status')

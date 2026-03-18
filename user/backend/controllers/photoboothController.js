@@ -3,7 +3,11 @@ import fs from "fs";
 import path from "path";
 import pool from "../config/db.js";
 import { fileURLToPath } from "url";
+import QRCode from "qrcode";
 import sharp from "sharp";
+import axios from "axios";
+import FormData from "form-data";
+import fetch from "node-fetch";
 import { v4 as uuidv4 } from "uuid";
 
 // Mendefinisikan __dirname secara manual untuk ES Modules
@@ -51,12 +55,12 @@ const configLayoutFrame = [
         name: "frame3",
         location: "3_f_basic1.png",
         width: 490,
-        height: 300,
+        height: 291,
         slots: [
-            { top: 150, left: 60 },
-            { top: 460, left: 60 },
-            { top: 780, left: 60 },
-            { top: 1100, left: 60 },
+            { top: 146, left: 55 },
+            { top: 470, left: 55 },
+            { top: 789, left: 55 },
+            { top: 1106, left: 55 },
         ],
     },
 ]
@@ -159,11 +163,14 @@ router.post("/save-session", async (req, res) => {
     // =========================
     // 4. APPLY FRAME
     // =========================
-    const framePath = path.join(
-      __dirname,
-    //   "../public/images/frames/20260224_121138.png"
-      "../public/images/frames/" + tiketRows.frame_location
-    );
+    // const framePath = path.join(
+    //   __dirname,
+    // //   "../public/images/frames/20260224_121138.png"
+    //   "../public/images/frames/" + tiketRows.frame_location
+    // );
+    const framePath = "http://127.0.0.1:8000/storage/" + tiketRows.frame_location;
+    const response = await fetch(framePath);
+    const frameBufferRaw = await response.buffer();
 
     const finalPath = path.join(sessionDir, "final.png");
 
@@ -174,7 +181,7 @@ router.post("/save-session", async (req, res) => {
       .ensureAlpha()
       .toBuffer();
 
-    const frameBuffer = await sharp(framePath)
+    const frameBuffer = await sharp(frameBufferRaw)
       .rotate()
       .resize(mergedMeta.width, mergedMeta.height, { fit: "fill" })
       .ensureAlpha()
@@ -367,29 +374,92 @@ router.post("/apply-filter", async (req, res) => {
   try {
     const { image, sessionId } = req.body;
 
-    const sessionDir = path.join(
-      __dirname,
-      "../uploads/sessions",
-      sessionId
-    );
+    const sessionDir = path.join(__dirname, "../uploads/sessions", sessionId);
 
     if (!fs.existsSync(sessionDir)) {
       fs.mkdirSync(sessionDir, { recursive: true });
     }
 
-    const base64Data = image.replace(
-      /^data:image\/png;base64,/,
-      ""
-    );
+    const base64Data = image.replace(/^data:image\/png;base64,/, "");
+    const imgBuffer = Buffer.from(base64Data, "base64");
+
+    const meta = await sharp(imgBuffer).metadata();
+
+    const width = meta.width;
+    const height = meta.height;
+
+    // buat canvas 2x lebar
+    const result = await sharp({
+      create: {
+        width: width * 2,
+        height: height,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      }
+    })
+      .composite([
+        {
+          input: imgBuffer,
+          top: 0,
+          left: 0
+        },
+        {
+          input: imgBuffer,
+          top: 0,
+          left: width
+        }
+      ])
+      .png()
+      .toBuffer();
 
     const filePath = path.join(sessionDir, "final_from_preview.png");
 
-    fs.writeFileSync(filePath, base64Data, "base64");
+    fs.writeFileSync(filePath, result);
 
+    // =========================
+    // GENERATE LINK DOWNLOAD
+    // =========================
+
+    // =========================
+    // KIRIM KE LARAVEL
+    // =========================
+    const formData = new FormData();
+    formData.append("image", result, {
+      filename: "final.png",
+      contentType: "image/png",
+    });
+
+    const laravelUrl = process.env.LARAVEL_API_URL;
+    
+    const laravelRes = await axios.post(
+      `${laravelUrl}/api/upload-photo`,
+      formData,
+      {
+        headers: formData.getHeaders(),
+      }
+    );
+    const finalUrl = laravelRes.data.url;
+    // const finalUrl = `http://localhost:3000/uploads/sessions/${sessionId}/final_from_preview.png`;
+
+    // =========================
+    // GENERATE QR CODE
+    // =========================
+    const qrPath = path.join(sessionDir, "qr_download.png");
+
+    await QRCode.toFile(qrPath, finalUrl, {
+      width: 400,
+      margin: 2
+    });
+
+    // =========================
+    // RESPONSE
+    // =========================
     return res.json({
       success: true,
-      url: `/uploads/sessions/${sessionId}/final_from_preview.png`,
+      finalUrl,
+      qrUrl: `/uploads/sessions/${sessionId}/qr_download.png`
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Gagal simpan preview" });
@@ -438,11 +508,11 @@ router.get("/session/:sessionId", async (req, res) => {
 });
 
 
-router.get("/debug", async (req, res) => {
+router.get("/debug1", async (req, res) => {
   try {
     // const  { selectedIndexes, kode_tiket } = req.body;
 
-    const sessionId = `2026-03-02-2cc6d2af-7984-47d8-9c02-818aa9245e57`;
+    const sessionId = `debug-sessions`;
     const sessionDir = path.join(__dirname, "../uploads/sessions", sessionId);
     fs.mkdirSync(sessionDir, { recursive: true });
     
@@ -499,7 +569,7 @@ router.get("/debug", async (req, res) => {
     // =========================
     const framePath = path.join(
       __dirname,
-      "../public/images/frames/20260224_121138.png"
+      "../public/images/frames/3_f_grandopeningblue.png"
       // "../public/images/frames/" + tiketRows.frame_location
     );
 
@@ -533,11 +603,120 @@ router.get("/debug", async (req, res) => {
     // =========================
     // RESPONSE
     // =========================
-    res.json({
-      sessionId,
-      finalUrl: `/uploads/sessions/${sessionId}/final.png`,
-      mergedUrl: `/uploads/sessions/${sessionId}/merged.png`,
+    // res.json({
+    //   sessionId,
+    //   finalUrl: `/uploads/sessions/${sessionId}/final.png`,
+    //   mergedUrl: `/uploads/sessions/${sessionId}/merged.png`,
+    // });
+    const finalUrl = path.join(__dirname, `../uploads/sessions/${sessionId}/final.png`);
+    res.sendFile(finalUrl)
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Save session failed" });
+  }
+});
+router.get("/debug2", async (req, res) => {
+  try {
+    // const  { selectedIndexes, kode_tiket } = req.body;
+
+    const sessionId = `debug-sessions`;
+    const sessionDir = path.join(__dirname, "../uploads/sessions", sessionId);
+    fs.mkdirSync(sessionDir, { recursive: true });
+    
+
+    // =========================
+    // 2. PREPARE SLOT PHOTOS
+    // =========================
+    const selectedFiles = [
+      path.join(sessionDir, `shot_2.png`),
+      path.join(sessionDir, `shot_2.png`),
+      path.join(sessionDir, `shot_3.png`),
+      path.join(sessionDir, `shot_3.png`),
+    ];
+
+    // resize foto biar konsisten
+    const resizedPhotos = await Promise.all(
+      selectedFiles.map((file) =>
+        sharp(file)
+          .resize(configLayoutFrame[2].width, configLayoutFrame[2].height, { fit: "cover" }) // ukuran slot foto
+          .toBuffer()
+      )
+    );
+
+    // =========================
+    // 3. CREATE CANVAS + SLOT POSITION
+    // =========================
+    const canvasWidth = 600;
+    const canvasHeight = 1800;
+
+    const baseCanvas = sharp({
+      create: {
+        width: canvasWidth,
+        height: canvasHeight,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
     });
+
+    const composites = resizedPhotos.map((buf, i) => ({
+      input: buf,
+      top: configLayoutFrame[2].slots[i].top,
+      left: configLayoutFrame[2].slots[i].left,
+    }));
+
+    const mergedPath = path.join(sessionDir, "merged.png");
+
+    await baseCanvas
+      .composite(composites)
+      .png()
+      .toFile(mergedPath);
+
+    // =========================
+    // 4. APPLY FRAME
+    // =========================
+    const framePath = path.join(
+      __dirname,
+      "../public/images/frames/3_f_grandopeningblue.png"
+      // "../public/images/frames/" + tiketRows.frame_location
+    );
+
+    const finalPath = path.join(sessionDir, "final.png");
+
+    const mergedMeta = await sharp(mergedPath).metadata();
+
+    const mergedBuffer = await sharp(mergedPath)
+      .resize(mergedMeta.width, mergedMeta.height)
+      .ensureAlpha()
+      .toBuffer();
+
+    const frameBuffer = await sharp(framePath)
+      .rotate()
+      .resize(mergedMeta.width, mergedMeta.height, { fit: "fill" })
+      .ensureAlpha()
+      .toBuffer();
+
+    await sharp(mergedBuffer)
+      .composite([
+        {
+          input: frameBuffer,
+          blend: "over",
+          top: 0,
+          left: 0,
+        },
+      ])
+      .png()
+      .toFile(finalPath);
+
+    // =========================
+    // RESPONSE
+    // =========================
+    // res.json({
+    //   sessionId,
+    //   finalUrl: `/uploads/sessions/${sessionId}/final.png`,
+    //   mergedUrl: `/uploads/sessions/${sessionId}/merged.png`,
+    // });
+    const finalUrl = path.join(__dirname, `../uploads/sessions/${sessionId}/merged.png`);
+    res.sendFile(finalUrl)
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Save session failed" });

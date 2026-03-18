@@ -42,6 +42,12 @@ const CardFilter = ({ gambar, nama_filter, isActive, onClick }) => {
 
 export default function Filter() {
   const navigate = useNavigate();
+  
+  const checkSetupEnv = localStorage.getItem('setup-roombox')
+
+  if (!checkSetupEnv) {
+    return window.location.href = '/setup'
+  }
 
   const filters = [
     { id: 1, name: "none" },
@@ -94,6 +100,9 @@ export default function Filter() {
     const data = await res.json();
 
     if (data.success) {
+      // console.log(data.url)
+      localStorage.setItem('finalUrl', api + data.url)
+      localStorage.setItem('qrUrl', api + data.qrUrl)
       navigate('/waiting')
     }
 
@@ -105,28 +114,31 @@ export default function Filter() {
       {/* LEFT PREVIEW */}
       <div className="w-[600px] h-[580px] mr-4 flex justify-center items-center">
         {preview && previewMerged ? (
-          <div className="w-full h-full flex ">
-            <div className="relative  flex w-full h-full" id="preview-grid">
-              <img
-                src={previewMerged}
-                className="object-contain absolute left-0 top-0 object-right w-full h-full  p-0"
-                style={{filter: FILTER_STYLES[selectedFilter]}}
-                />
-              <img
-                src={preview}
-                className="object-contain object-right w-full h-full  p-0"
-                />
-            </div>
-            <div className="relative  flex w-full h-full">
-              <img
-                src={previewMerged}
-                className="object-contain absolute left-0 top-0 object-left w-full h-full  p-0"
-                style={{filter: FILTER_STYLES[selectedFilter]}}
-                />
-              <img
-                src={preview}
-                className="object-contain object-left w-full h-full  p-0"
-                />
+          <div className="w-full h-full flex justify-center items-center">
+            <div className="flex items-center justify-center w-[95%] p-10">
+
+              <div className="relative  flex justify-center w-full h-full bg-red-400" id="preview-grid">
+                  <img
+                    src={previewMerged}
+                    className="object-cover absolute left-0 top-[0px] object-right w-full h-full  p-0"
+                    style={{filter: FILTER_STYLES[selectedFilter]}}
+                    />
+                  <img
+                    src={preview}
+                    className="object-cover object-right w-full h-full  p-0"
+                    />
+              </div>
+              <div className="relative  flex w-full h-full">
+                <img
+                  src={previewMerged}
+                  className="object-contain absolute left-0 top-[0px] object-left w-full h-full  p-0"
+                  style={{filter: FILTER_STYLES[selectedFilter]}}
+                  />
+                <img
+                  src={preview}
+                  className="object-contain object-left w- w-[320px] h-full  p-0"
+                  />
+              </div>
             </div>
           </div>
         ) : (
