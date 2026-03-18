@@ -17,6 +17,12 @@ const Waiting = () => {
 
     setAllPhotos(urls);
   }
+  
+  const checkSetupEnv = localStorage.getItem('setup-roombox')
+
+  if (!checkSetupEnv) {
+    return window.location.href = '/setup'
+  }
 
   const getStatusPrint = () => {
     const kode_tiket = localStorage.getItem('kode_tiket')

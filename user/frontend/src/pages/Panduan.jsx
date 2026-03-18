@@ -12,6 +12,12 @@ const Panduan = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [countdown, setCountdown] = useState(5);
   const navigate = useNavigate();
+  
+  const checkSetupEnv = localStorage.getItem('setup-roombox')
+
+  if (!checkSetupEnv) {
+    return window.location.href = '/setup'
+  }
 
   // 🔄 Auto Carousel (3 detik)
   useEffect(() => {

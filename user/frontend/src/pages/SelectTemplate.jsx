@@ -17,6 +17,12 @@ function SelectTemplate() {
   
   const formattedHour = String(getSessionTime).padStart(2, '0'); 
   const formattedTime = getSessionTime ? `${formattedHour}:00` : '00:00'; 
+  
+  const checkSetupEnv = localStorage.getItem('setup-roombox')
+
+  if (!checkSetupEnv) {
+    return window.location.href = '/setup'
+  }
 
   const getFrameTemplate = () => {
     fetch(api + '/api/frame/get-template')

@@ -42,6 +42,12 @@ const CardFilter = ({ gambar, nama_filter, isActive, onClick }) => {
 
 export default function Filter() {
   const navigate = useNavigate();
+  
+  const checkSetupEnv = localStorage.getItem('setup-roombox')
+
+  if (!checkSetupEnv) {
+    return window.location.href = '/setup'
+  }
 
   const filters = [
     { id: 1, name: "none" },

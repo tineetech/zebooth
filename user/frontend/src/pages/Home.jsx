@@ -4,6 +4,12 @@ import CheckSetup from '../components/CheckSetup'
 
 export default function Home() {
   const nav = useNavigate()
+  
+  const checkSetupEnv = localStorage.getItem('setup-roombox')
+
+  if (!checkSetupEnv) {
+    return window.location.href = '/setup'
+  }
 
   return (
     <div className='flex justify-center gap-10 items-center h-full flex-col'>

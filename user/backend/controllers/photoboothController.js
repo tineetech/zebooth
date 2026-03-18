@@ -5,6 +5,8 @@ import pool from "../config/db.js";
 import { fileURLToPath } from "url";
 import QRCode from "qrcode";
 import sharp from "sharp";
+import axios from "axios";
+import FormData from "form-data";
 import fetch from "node-fetch";
 import { v4 as uuidv4 } from "uuid";
 
@@ -417,7 +419,27 @@ router.post("/apply-filter", async (req, res) => {
     // =========================
     // GENERATE LINK DOWNLOAD
     // =========================
-    const finalUrl = `http://localhost:3000/uploads/sessions/${sessionId}/final_from_preview.png`;
+
+    // =========================
+    // KIRIM KE LARAVEL
+    // =========================
+    const formData = new FormData();
+    formData.append("image", result, {
+      filename: "final.png",
+      contentType: "image/png",
+    });
+
+    const laravelUrl = process.env.LARAVEL_API_URL;
+    
+    const laravelRes = await axios.post(
+      `${laravelUrl}/api/upload-photo`,
+      formData,
+      {
+        headers: formData.getHeaders(),
+      }
+    );
+    const finalUrl = laravelRes.data.url;
+    // const finalUrl = `http://localhost:3000/uploads/sessions/${sessionId}/final_from_preview.png`;
 
     // =========================
     // GENERATE QR CODE

@@ -8,7 +8,7 @@ const router = express.Router();
 // ===========================
 router.post("/verify", async (req, res) => {
   try {
-    const { tiket } = req.body;
+    const { tiket, roomBoxId } = req.body;
 
     if (!tiket) {
       return res.status(400).json({
@@ -21,8 +21,8 @@ router.post("/verify", async (req, res) => {
     // CEK ROOM ACTIVE
     // =========================
     const [rows] = await pool.query(
-      "SELECT * FROM tiket WHERE ticket_code = ? AND status_payment = true AND status != 'finish' LIMIT 1",
-      [tiket]
+      "SELECT * FROM tiket WHERE ticket_code = ? AND status_payment = true AND status != 'finish' AND room_box_id = ? LIMIT 1",
+      [tiket, roomBoxId]
     );
 
     if (rows.length === 0) {

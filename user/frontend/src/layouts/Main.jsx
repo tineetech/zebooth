@@ -3,6 +3,7 @@ import Grainient from '../components/Gradient'
 import CheckSetup from '../components/CheckSetup'
 
 const Main = ({ children }) => {
+    
   return (
     <main className='w-full h-[100vh]  relative'>
 

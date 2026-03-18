@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Tiket;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TiketController extends Controller
 {
@@ -47,5 +49,28 @@ class TiketController extends Controller
             ->setPaper([0, 0, 300, 420], 'portrait'); // Custom size (width x height)
 
         return $pdf->stream('Ticket-' . $tiket->ticket_code . '.pdf');
+    }
+
+    public function uploadFoto(Request $request)
+    {
+        if (!$request->hasFile('image')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No file uploaded'
+            ], 400);
+        }
+
+        $file = $request->file('image');
+
+        // nama random biar aman
+        $filename = 'photos/' . Str::uuid() . '.png';
+
+        // simpan ke storage/app/public/photos
+        Storage::disk('public')->put($filename, file_get_contents($file));
+
+        return response()->json([
+            'success' => true,
+            'url' => asset('storage/' . $filename)
+        ]);
     }
 }

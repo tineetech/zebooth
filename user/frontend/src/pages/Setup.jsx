@@ -38,6 +38,7 @@ const Setup = () => {
 
       if (data.success) {
           localStorage.setItem("setup-roombox", roomCode)
+          localStorage.setItem("id-roombox", data.data.id)
           Swal.fire({
             title: "Success!",
             text: "Berhasil login roombox dan melakukan setup room.",
@@ -51,7 +52,7 @@ const Setup = () => {
       } else {
         Swal.fire({
           title: "Failed!",
-          text: "Gagal login, kode room salah atau room tidak active.",
+          text: "Gagal login, kode room salah atau room sedang digunakan.",
           icon: "error",
           timer: 2000,
           showConfirmButton: false,

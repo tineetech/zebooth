@@ -20,6 +20,12 @@ export default function Camera() {
   const [flash, setFlash] = useState(false);
 
   const MAX_SHOTS = 10;
+  
+  const checkSetupEnv = localStorage.getItem('setup-roombox')
+
+  if (!checkSetupEnv) {
+    return window.location.href = '/setup'
+  }
 
   const getTiketConfig = () => {
     const kode_tiket = localStorage.getItem('kode_tiket')
