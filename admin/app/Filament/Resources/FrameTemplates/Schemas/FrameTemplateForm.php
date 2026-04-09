@@ -18,7 +18,7 @@ class FrameTemplateForm
                     ->visibility('public')
                     ->disk('public')
                     ->directory('frames') // Folder penyimpanan di storage
-                    ->image() // Opsional: batasi hanya untuk gambar
+                    ->image()
                     ->label('Gambar Frame'),
                 Select::make('frame_config_id')
                     ->relationship('frameConfig', 'name'),

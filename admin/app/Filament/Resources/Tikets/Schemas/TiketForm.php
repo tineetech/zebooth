@@ -7,7 +7,6 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Schema;
 
 class TiketForm
@@ -84,7 +83,7 @@ class TiketForm
                     ->rules(['required', 'in:waiting,running,finish']),
 
                 // QR Code Preview
-                Placeholder::make('qr_preview')
+                TextInput::make('qr_preview')
                     ->label('QR code')
                     ->content(function (?\App\Models\Tiket $record) {
                         $value = $record?->ticket_code;
